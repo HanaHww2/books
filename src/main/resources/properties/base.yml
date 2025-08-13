@@ -1,0 +1,12 @@
+# local 환경
+spring:
+  config.activate.on-profile: local
+server:
+  port: 8080
+
+---
+# test 환경
+spring:
+  config.activate.on-profile: test
+server:
+  port: 8080

@@ -1,0 +1,27 @@
+# local 환경
+spring:
+  config.activate.on-profile: local
+  datasource:
+    url: jdbc:postgresql://localhost:5432/book?rewriteBatchedInserts=true
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      data-source-properties:
+        rewriteBatchedInserts: true
+  sql:
+    init:
+      mode: never #always
+      schema-locations: classpath:db/schema.sql
+      #data-locations: classpath:db/data.sql
+
+---
+# test 환경
+spring:
+  config.activate.on-profile: test
+  datasource:
+    url: jdbc:tc:postgresql:17.5:///book
+    username: postgres
+    password: postgres
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+---

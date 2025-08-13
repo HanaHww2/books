@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: book
+  config:
+    import:
+      - classpath:properties/base.yml
+      - classpath:properties/datasource.yml
+      - classpath:properties/jpa.yml
+  profiles:
+    group:
+      local: local
+      test: test
+      dev: dev
+      prod: prod
+    active: local

@@ -11,9 +11,9 @@ spring:
         rewriteBatchedInserts: true
   sql:
     init:
-      mode: never #always
+      mode: always # never
       schema-locations: classpath:db/schema.sql
-      #data-locations: classpath:db/data.sql
+      data-locations: classpath:db/data.sql
 
 ---
 # test 환경
@@ -24,4 +24,7 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  sql:
+    init:
+      mode: never
 ---

@@ -1,0 +1,3 @@
+-- BOOK
+ALTER SEQUENCE books_seq INCREMENT BY 1;
+ALTER TABLE books ALTER COLUMN id SET DEFAULT nextval('books_seq');

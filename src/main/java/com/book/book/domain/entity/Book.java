@@ -32,7 +32,7 @@ public class Book extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="books_seq_gen")
   private Long id;
 
-  @Column(unique = true)
+  @Column(unique = true, length = 13)
   private String isbn;
 
   @Embedded

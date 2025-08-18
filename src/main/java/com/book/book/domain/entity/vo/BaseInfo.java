@@ -16,8 +16,8 @@ public class BaseInfo {
   @Column(nullable = false)
   private String title;
 
+  private String subTitle;
+
   @Column(nullable = false)
   private String author;
-
-  private String subTitle;
 }

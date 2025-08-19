@@ -20,8 +20,8 @@ public class NaverBookWebClient {
   private final String naverClientSecret;
 
   public NaverBookWebClient(
-      @Value("${NAVER_CLIENT_ID}") String clientId,
-      @Value("${NAVER_CLIENT_SECRET}") String clientSecret
+      @Value("${NAVER_CLIENT_ID:dummy}") String clientId,
+      @Value("${NAVER_CLIENT_SECRET:dummy}") String clientSecret
   ) {
     if (Objects.isNull(clientId) || Objects.isNull(clientSecret)) {
       throw new IllegalStateException("NAVER_CLIENT_ID, NAVER_CLIENT_SECRET 환경 변수가 필요합니다.");

@@ -1,0 +1,5 @@
+### 도서 상세 조회 - isbn
+GET {{url}}/api/v1/books?isbn=9791193000717
+
+### 도서 상세 조회 - id
+GET {{url}}/api/v1/books?id=13

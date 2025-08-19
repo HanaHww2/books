@@ -10,9 +10,11 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestConstructor;
 
 @Disabled("sql 파일을 만들기 위해서 사용하는 코드입니다. naver api의 클라이언트 아이디, 시크릿이 필요합니다.")
 @ActiveProfiles("test")
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @SpringBootTest
 class BookSqlExportTest {
 

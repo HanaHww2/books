@@ -23,8 +23,8 @@ public class BookInsertSqlBuilder {
     LocalDate published = parseDate(i.pubdate());
 
     return """
-        INSERT INTO %s (id, isbn, title, sub_title, author, price, description, image, publisher, published)
-        VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO %s (id, isbn, title, sub_title, author, price, description, image, publisher, published, created_at, updated_at)
+        VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now())
         ON CONFLICT (isbn) DO NOTHING;
         """.formatted(
         table,

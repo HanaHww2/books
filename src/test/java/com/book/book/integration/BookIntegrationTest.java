@@ -11,7 +11,10 @@ import com.book.book.domain.entity.Book;
 import com.book.book.domain.repository.BookRepository;
 import com.book.book.fixture.BookFixture;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +45,12 @@ public class BookIntegrationTest {
 
   private Book book;
 
+  private static final DateTimeFormatter LDT_MICROS =
+      new DateTimeFormatterBuilder()
+          .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+          .appendFraction(ChronoField.NANO_OF_SECOND, 6, 6, true) // 항상 6자리
+          .toFormatter();
+
   @BeforeEach
   void setUp() {
     book = BookFixture.create();
@@ -53,7 +62,11 @@ public class BookIntegrationTest {
   void getBookDetailInfo() throws Exception {
 
     // given
-    DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    DateTimeFormatter LDT_MICROS =
+        new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+            .appendFraction(ChronoField.NANO_OF_SECOND, 6, 6, true)
+            .toFormatter();
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("isbn", "1234567890123");
@@ -77,8 +90,12 @@ public class BookIntegrationTest {
         .andExpect(jsonPath("$.image").value(book.getExtraInfo().getImage()))
         .andExpect(jsonPath("$.publisher").value(book.getPublishInfo().getPublisher()))
         .andExpect(jsonPath("$.published").value(book.getPublishInfo().getPublished().toString()))
-        .andExpect(jsonPath("$.createdAt").value(ISO.format(book.getCreatedAt())))
-        .andExpect(jsonPath("$.updatedAt").value(ISO.format(book.getUpdatedAt())))
+        .andExpect(jsonPath("$.createdAt").value(LDT_MICROS.format(toMicros(book.getCreatedAt()))))
+        .andExpect(jsonPath("$.updatedAt").value(LDT_MICROS.format(toMicros(book.getUpdatedAt()))))
         .andExpect(jsonPath("$.deletedAt").value(nullValue()));
+  }
+
+  private static LocalDateTime toMicros(LocalDateTime t) {
+    return t.withNano((t.getNano() / 1_000) * 1_000);
   }
 }

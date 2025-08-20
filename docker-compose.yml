@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./logs_8080:/logs
+      - ./logs_8080:/app/logs
     environment:
       SPRING_PROFILES_ACTIVE: dev
     depends_on:

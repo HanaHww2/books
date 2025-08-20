@@ -28,4 +28,21 @@ spring:
     init:
       mode: always
       schema-locations: classpath:db/test_schema.sql
+
 ---
+# dev 환경
+spring:
+  config.activate.on-profile: dev
+  datasource:
+    url: jdbc:postgresql://book-pgsql:5432/book?rewriteBatchedInserts=true
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      data-source-properties:
+        rewriteBatchedInserts: true
+  sql:
+    init:
+      mode: always # never
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql

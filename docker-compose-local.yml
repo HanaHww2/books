@@ -1,7 +1,12 @@
 services:
   pgsql:
     container_name: book-db
-    image: postgres:17.5
+    build:
+      context: .
+      dockerfile: Dockerfile.pg-ko
+      args:
+        PG_MAJOR: "16"
+    image: my-postgres:ko
     ports:
       - "5432:5432"
     environment:

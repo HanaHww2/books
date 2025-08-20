@@ -2,8 +2,12 @@ package com.book.book.presentation;
 
 import com.book.book.application.service.BookReadService;
 import com.book.book.presentation.dto.request.GetBookDetailRequest;
+import com.book.book.presentation.dto.request.SearchBookListRequest;
 import com.book.book.presentation.dto.response.BookDetailResponse;
+import com.book.book.presentation.dto.response.SearchBookListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +25,15 @@ public class BookController {
       @Validated GetBookDetailRequest req) {
 
     BookDetailResponse res = BookDetailResponse.from(bookReadService.findBookDetailInfoBy(req.toQuery()));
+    return ResponseEntity.ok(res);
+  }
+
+  @GetMapping("/list")
+  public ResponseEntity<SearchBookListResponse> searchBookList(
+      @PageableDefault Pageable pageable,
+      @Validated SearchBookListRequest req) {
+
+    SearchBookListResponse res = SearchBookListResponse.from(bookReadService.searchBookListBy(req.toQuery(), pageable));
     return ResponseEntity.ok(res);
   }
 }

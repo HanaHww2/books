@@ -18,5 +18,17 @@ services:
       - postgres-book-data:/var/lib/postgresql/data
     command: [ "postgres", "-c", "log_statement=all", "-c", "log_destination=stderr" ]
 
+  redis:
+    container_name: book-redis
+    image: redis:8
+    ports:
+      - "6379:6379"
+    environment:
+      TZ: Asia/Seoul
+      REDIS_ARGS: "--requirepass systempass"
+    volumes:
+      - redis-book-data:/data
+
 volumes:
   postgres-book-data:
+  redis-book-data:

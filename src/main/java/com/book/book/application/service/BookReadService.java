@@ -3,6 +3,7 @@ package com.book.book.application.service;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.book.book.application.dto.info.BookDetailInfo;
+import com.book.book.application.dto.info.PopularKeywordListInfo;
 import com.book.book.application.dto.info.SearchBookListInfo;
 import com.book.book.application.dto.query.GetBookDetailQuery;
 import com.book.book.application.dto.query.SearchBookListQuery;
@@ -10,10 +11,13 @@ import com.book.book.application.exception.BookErrorCode;
 import com.book.book.application.service.search_strategy.SearchStrategy;
 import com.book.book.application.service.search_strategy.SearchStrategyResolver;
 import com.book.book.domain.entity.Book;
+import com.book.book.domain.info.PopularKeyword;
 import com.book.book.domain.repository.BookRepository;
+import com.book.book.domain.repository.PopularKeywordRepository;
 import com.book.common.exception.CommonApiException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +29,7 @@ public class BookReadService {
 
   private final SearchStrategyResolver searchStrategyResolver;
   private final BookRepository bookRepository;
+  private final PopularKeywordRepository popularKeywordRepository;
 
   public BookDetailInfo findBookDetailInfoBy(GetBookDetailQuery query) {
 
@@ -49,9 +54,16 @@ public class BookReadService {
     String tsquery = strategy.buildQuery(keyword);
 
     Page<Book> bookPage = bookRepository.searchBooks(tsquery, pageable);
+    popularKeywordRepository.record(strategy.getKeywords(keyword), strategy.type());
     Instant end = Instant.now();
     long executionTime = Duration.between(start, end).toMillis();
 
     return SearchBookListInfo.of(bookPage, keyword, strategy.type().name(), executionTime);
+  }
+
+  public PopularKeywordListInfo getTop10KeywordListInfoInPrevHour() {
+
+    List<PopularKeyword> popularKeywords = popularKeywordRepository.top10KeywordsInPrevHour();
+    return PopularKeywordListInfo.from(popularKeywords);
   }
 }

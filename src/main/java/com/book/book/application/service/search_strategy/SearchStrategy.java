@@ -5,4 +5,6 @@ public interface SearchStrategy {
   SearchStrategyType type();
 
   String buildQuery(String keyword);
+
+  String[] getKeywords(String keyword);
 }

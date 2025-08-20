@@ -1,6 +1,7 @@
 package com.book.book.infrastructure.persistence.jpa;
 
 import com.book.book.domain.entity.Book;
+import com.book.book.domain.info.BookSimpleInfo;
 import com.book.book.domain.repository.BookRepository;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,14 @@ public interface BookJpaRepository
 
   @Query(
       value = """
-      SELECT b.*
+      SELECT 
+              b.id, 
+              b.title, 
+              b.sub_title, 
+              b.author, 
+              b.image, 
+              b.isbn, 
+              b.published
       FROM books b
       WHERE b.tsv @@ to_tsquery(:tsquery)
       ORDER BY b.published DESC
@@ -28,7 +36,7 @@ public interface BookJpaRepository
     """,
     nativeQuery = true
   )
-  Page<Book> searchBooks(
+  Page<BookSimpleInfo> searchBooks(
       @Param("tsquery") String tsquery,
       Pageable pageable
   );

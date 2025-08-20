@@ -1,6 +1,7 @@
 package com.book.book.presentation.dto.response;
 
 import com.book.book.application.dto.info.SearchBookListInfo;
+import com.book.book.application.dto.info.SearchBookListInfo.SearchBookInfo;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
@@ -52,15 +53,15 @@ public record SearchBookListResponse(
       LocalDate published
   ) {
 
-    public static SearchBookResponse from(SearchBookListInfo.SearchBookResponse searchBookResponse) {
+    public static SearchBookResponse from(SearchBookInfo searchBookInfo) {
       return SearchBookResponse.builder()
-          .id(searchBookResponse.id())
-          .title(searchBookResponse.title())
-          .subTitle(searchBookResponse.subTitle())
-          .image(searchBookResponse.image())
-          .author(searchBookResponse.author())
-          .isbn(searchBookResponse.isbn())
-          .published(searchBookResponse.published())
+          .id(searchBookInfo.id())
+          .title(searchBookInfo.title())
+          .subTitle(searchBookInfo.subTitle())
+          .image(searchBookInfo.image())
+          .author(searchBookInfo.author())
+          .isbn(searchBookInfo.isbn())
+          .published(searchBookInfo.published())
           .build();
     }
   }

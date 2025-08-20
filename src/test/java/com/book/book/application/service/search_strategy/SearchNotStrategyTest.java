@@ -26,4 +26,17 @@ class SearchNotStrategyTest {
     // then
     assertThat(tsquery).isEqualTo("'카네기' & !'딸'");
   }
+
+  @Test
+  @DisplayName("'-' 구분자로 키워드를 분리하고 첫번째 요소만 반환")
+  void getKeywords_returnOnlyFirstSplitedByHyphen() {
+    // given
+    String keyword = "카네기-딸";
+
+    // when
+    String[] result = strategy.getKeywords(keyword);
+
+    // then
+    assertThat(result).containsExactly("카네기");
+  }
 }

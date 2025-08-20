@@ -12,10 +12,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.book.book.application.dto.info.BookDetailInfo;
+import com.book.book.application.dto.info.PopularKeywordListInfo;
 import com.book.book.application.dto.info.SearchBookListInfo;
 import com.book.book.application.dto.query.GetBookDetailQuery;
 import com.book.book.application.dto.query.SearchBookListQuery;
 import com.book.book.fixture.BookDetailInfoFixture;
+import com.book.book.fixture.PopularKeywordListInfoFixture;
 import com.book.book.fixture.SearchBookListInfoFixture;
 import com.book.common.support.ControllerTestSupport;
 import java.time.format.DateTimeFormatter;
@@ -183,5 +185,30 @@ class BookControllerTest extends ControllerTestSupport {
             .value("잘못된 키워드입니다. (키워드는 최대 2개까지 가능하며, '|' 또는 '-' 으로만 연결해야 하며 공백이 있어서는 안 됩니다.)"))
         .andDo(print());
     verifyNoInteractions(bookReadService);
+  }
+
+  @DisplayName("인기 검색어 10 조회 - 200 성공")
+  @Test
+  void getTop10KeywordsInPrevHour() throws Exception {
+
+    // given
+    PopularKeywordListInfo keywordListInfo = PopularKeywordListInfoFixture.create();
+    when(bookReadService.getTop10KeywordListInfoInPrevHour())
+        .thenReturn(keywordListInfo);
+
+    // when
+    ResultActions resultActions = mockMvc.perform(
+        get("/api/v1/books/popular-keywords"));
+
+    // then
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.keywords[0].keyword")
+            .value(keywordListInfo.keywords().get(0).keyword()))
+        .andExpect(jsonPath("$.keywords[0].hits")
+            .value(keywordListInfo.keywords().get(0).hits()))
+        .andExpect(jsonPath("$.keywords[0].rank")
+            .value(keywordListInfo.keywords().get(0).rank()));
   }
 }

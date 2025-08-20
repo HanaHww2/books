@@ -14,4 +14,9 @@ public class SearchBasicStrategy implements SearchStrategy {
   public String buildQuery(String keyword) {
     return "'" + keyword + "'";
   }
+
+  @Override
+  public String[] getKeywords(String keyword) {
+    return new String[] {keyword};
+  }
 }

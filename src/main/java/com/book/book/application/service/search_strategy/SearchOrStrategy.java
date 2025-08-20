@@ -15,4 +15,9 @@ public class SearchOrStrategy implements SearchStrategy {
     String[] keywords = keyword.split("\\|");
     return "'" + keywords[0] + "' | '" + keywords[1] + "'";
   }
+
+  @Override
+  public String[] getKeywords(String keyword) {
+    return keyword.split("\\|");
+  }
 }

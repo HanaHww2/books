@@ -4,6 +4,7 @@ import com.book.book.application.service.BookReadService;
 import com.book.book.presentation.dto.request.GetBookDetailRequest;
 import com.book.book.presentation.dto.request.SearchBookListRequest;
 import com.book.book.presentation.dto.response.BookDetailResponse;
+import com.book.book.presentation.dto.response.PopularKeywordListResponse;
 import com.book.book.presentation.dto.response.SearchBookListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,13 @@ public class BookController {
       @Validated SearchBookListRequest req) {
 
     SearchBookListResponse res = SearchBookListResponse.from(bookReadService.searchBookListBy(req.toQuery(), pageable));
+    return ResponseEntity.ok(res);
+  }
+
+  @GetMapping("/popular-keywords")
+  public ResponseEntity<PopularKeywordListResponse> getTop10KeywordsInPrevHour() {
+
+    PopularKeywordListResponse res = PopularKeywordListResponse.from(bookReadService.getTop10KeywordListInfoInPrevHour());
     return ResponseEntity.ok(res);
   }
 }

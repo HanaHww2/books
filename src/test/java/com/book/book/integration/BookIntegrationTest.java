@@ -10,7 +10,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.book.book.domain.entity.Book;
 import com.book.book.domain.repository.BookRepository;
+import com.book.book.domain.repository.PopularKeywordRepository;
 import com.book.book.fixture.BookFixture;
+import com.book.book.infrastructure.persistence.redis.utils.PopularKeywordBucketUtil;
 import com.book.common.support.IntegrationTestSupport;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -29,6 +31,9 @@ public class BookIntegrationTest extends IntegrationTestSupport {
 
   @Autowired
   private BookRepository bookRepository;
+
+  @Autowired
+  private PopularKeywordRepository popularKeywordRepository;
 
   private Book book;
 
@@ -113,5 +118,47 @@ public class BookIntegrationTest extends IntegrationTestSupport {
         .andExpect(jsonPath("$.pageInfo.totalPages").value(1))
         .andExpect(jsonPath("$.pageInfo.totalElements").value(1))
         .andExpect(jsonPath("$.books[0].isbn").value(book.getIsbn()));
+  }
+
+  @DisplayName("인기 검색어 10 조회 - 200 성공")
+  @Test
+  void getTop10KeywordsInPrevHour() throws Exception {
+
+    // given
+    String spring = "스프링";
+    Integer springHits = 30;
+
+    String bucket = PopularKeywordBucketUtil.prevHourBucketUtc();
+    stringRedisTemplate.opsForZSet().incrementScore(bucket, spring, springHits);
+    stringRedisTemplate.opsForZSet().incrementScore(bucket, "도커", 20);
+    stringRedisTemplate.opsForZSet().incrementScore(bucket, "자바", 10);
+
+    // when
+    ResultActions resultActions = mockMvc.perform(
+        get("/api/v1/books/popular-keywords"));
+
+    // then
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.keywords[0].keyword").value(spring))
+        .andExpect(jsonPath("$.keywords[0].hits").value(springHits))
+        .andExpect(jsonPath("$.keywords[0].rank").value(1));
+  }
+
+  @DisplayName("인기 검색어 10 조회 - 200 성공(데이터가 존재하지 않는 경우, 빈 리스트 반환)")
+  @Test
+  void getTop10KeywordsInPrevHour_whenReturnEmpty() throws Exception {
+
+    // given
+    // when
+    ResultActions resultActions = mockMvc.perform(
+        get("/api/v1/books/popular-keywords"));
+
+    // then
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.keywords").isEmpty());
   }
 }

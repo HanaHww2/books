@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -11,11 +12,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.book.book.application.dto.info.BookDetailInfo;
+import com.book.book.application.dto.info.SearchBookListInfo;
 import com.book.book.application.dto.query.GetBookDetailQuery;
+import com.book.book.application.dto.query.SearchBookListQuery;
 import com.book.book.application.exception.BookErrorCode;
+import com.book.book.application.service.search_strategy.SearchStrategy;
+import com.book.book.application.service.search_strategy.SearchStrategyResolver;
+import com.book.book.application.service.search_strategy.SearchStrategyType;
 import com.book.book.domain.entity.Book;
 import com.book.book.domain.repository.BookRepository;
+import com.book.book.fixture.BookFixture;
 import com.book.common.exception.CommonApiException;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,12 +32,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class BookReadServiceTest {
 
   @Mock
   BookRepository bookRepository;
+
+  @Mock
+  private SearchStrategyResolver searchStrategyResolver;
 
   @InjectMocks
   BookReadService service;
@@ -121,5 +136,36 @@ class BookReadServiceTest {
 
     verify(bookRepository).findById(id);
     verify(bookRepository, never()).findByIsbn(anyString());
+  }
+
+  @DisplayName("도서 정보 검색 - 단순 검색어 활용 성공")
+  @Test
+  void searchBookListBy_with_BasicOperation_success() {
+    // given
+    String keyword = "카네기";
+    Pageable pageable = PageRequest.of(0, 10);
+    SearchBookListQuery query = new SearchBookListQuery(keyword);
+
+    // 전략 mock
+    SearchStrategy strategy = mock(SearchStrategy.class);
+    given(searchStrategyResolver.resolve(keyword)).willReturn(strategy);
+    given(strategy.buildQuery(keyword)).willReturn("'카네기'");
+    given(strategy.type()).willReturn(SearchStrategyType.BASIC_OPERATION);
+
+    List<Book> books = List.of(
+        BookFixture.of("카네기 인간관계론", "9786543210123"),
+        BookFixture.of("카네기의 성공 습관", "9786543210124")
+    );
+    Page<Book> bookPage = new PageImpl<>(books, pageable, books.size());
+    given(bookRepository.searchBooks("'카네기'", pageable)).willReturn(bookPage);
+
+    // when
+    SearchBookListInfo result = service.searchBookListBy(query, pageable);
+
+    // then
+    assertThat(result.books()).hasSize(2);
+    assertThat(result.searchQuery()).isEqualTo("카네기");
+    assertThat(result.searchMetaData().strategy()).isEqualTo("BASIC_OPERATION");
+    assertThat(result.searchMetaData().executionTime()).isNotNegative();
   }
 }

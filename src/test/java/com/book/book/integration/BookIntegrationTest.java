@@ -95,6 +95,40 @@ public class BookIntegrationTest {
         .andExpect(jsonPath("$.deletedAt").value(nullValue()));
   }
 
+
+  @DisplayName("도서 정보 검색 api - 200 성공")
+  @Test
+  void searchBookList() throws Exception {
+
+    // given
+    String keyword = "title";
+    String pageNumber = "1";
+    String pageSize = "10";
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("keyword", keyword);
+    params.add("page", pageNumber);
+    params.add("size", pageSize);
+
+    // when
+    ResultActions resultActions = mockMvc.perform(
+        get("/api/v1/books/list")
+            .params(params));
+
+    // then
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.searchQuery").value(keyword))
+        .andExpect(jsonPath("$.searchMetaData.strategy").value("BASIC_OPERATION"))
+        .andExpect(jsonPath("$.searchMetaData.executionTime").exists())
+        .andExpect(jsonPath("$.pageInfo.currentPage").value(pageNumber))
+        .andExpect(jsonPath("$.pageInfo.pageSize").value(pageSize))
+        .andExpect(jsonPath("$.pageInfo.totalPages").value(1))
+        .andExpect(jsonPath("$.pageInfo.totalElements").value(1))
+        .andExpect(jsonPath("$.books[0].isbn").value(book.getIsbn()));
+  }
+
   private static LocalDateTime toMicros(LocalDateTime t) {
     return t.withNano((t.getNano() / 1_000) * 1_000);
   }

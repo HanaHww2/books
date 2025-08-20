@@ -2,6 +2,7 @@ package com.book.common.support;
 
 import com.book.book.application.service.BookReadService;
 import com.book.book.presentation.BookController;
+import com.book.common.config.WebConfig;
 import com.book.common.exception.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 )
 @Import({
     GlobalExceptionHandler.class,
+    WebConfig.class
 })
 @ActiveProfiles("test")
 public abstract class ControllerTestSupport {

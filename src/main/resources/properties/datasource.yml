@@ -20,11 +20,12 @@ spring:
 spring:
   config.activate.on-profile: test
   datasource:
-    url: jdbc:tc:postgresql:17.5:///book
+    url: jdbc:tc:postgresql:16:///book
     username: postgres
     password: postgres
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
   sql:
     init:
-      mode: never
+      mode: always
+      schema-locations: classpath:db/test_schema.sql
 ---

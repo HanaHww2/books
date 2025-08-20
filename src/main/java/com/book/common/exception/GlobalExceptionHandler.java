@@ -29,7 +29,6 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleException(CommonApiException e,
       HttpServletRequest request) {
 
-    log(e, request, e.getStatus());
     return ResponseEntity.status(e.getStatus())
         .body(ErrorResponse.from(e));
   }
@@ -44,7 +43,6 @@ public class GlobalExceptionHandler {
             violation.getMessage()))
         .toList();
 
-    log(e, request, BAD_REQUEST);
     return ResponseEntity
         .badRequest()
         .body(ErrorResponse.of(CommonErrorCode.INVALID_REQUEST.getMessage(),
@@ -65,7 +63,6 @@ public class GlobalExceptionHandler {
             fieldError.getDefaultMessage()))
         .toList();
 
-    log(e, request, BAD_REQUEST);
     return ResponseEntity
         .badRequest()
         .body(ErrorResponse.of(CommonErrorCode.INVALID_REQUEST.getMessage(),
@@ -87,7 +84,6 @@ public class GlobalExceptionHandler {
         )
     );
 
-    log(e, request, BAD_REQUEST);
     return ResponseEntity
         .badRequest()
         .body(ErrorResponse.of(CommonErrorCode.TYPE_MISMATCH.getMessage(),
@@ -107,7 +103,6 @@ public class GlobalExceptionHandler {
             result.getResolvableErrors().get(0).getDefaultMessage()))
         .toList();
 
-    log(e, request, BAD_REQUEST);
     return ResponseEntity
         .badRequest()
         .body(ErrorResponse.of(CommonErrorCode.INVALID_REQUEST.getMessage(),
@@ -119,7 +114,6 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleMissingRequestHeaderException(MissingRequestHeaderException e,
       HttpServletRequest request){
 
-    log(e, request, UNAUTHORIZED);
     return ResponseEntity
         .status(UNAUTHORIZED)
         .body(ErrorResponse.from(CommonErrorCode.UNAUTHORIZED));
@@ -130,7 +124,6 @@ public class GlobalExceptionHandler {
       HttpServletRequest request){
 
     HttpStatus status = BAD_REQUEST;
-    log(e, request, status);
     return ResponseEntity.status(status).body(ErrorResponse.of(e.getMessage(), CommonErrorCode.INVALID_REQUEST.name()));
   }
 
@@ -139,7 +132,6 @@ public class GlobalExceptionHandler {
       HttpServletRequest request){
 
     HttpStatus status = BAD_REQUEST;
-    log(e, request, status);
     return ResponseEntity.status(status).body(ErrorResponse.of(e.getMessage(), CommonErrorCode.INVALID_REQUEST.name()));
   }
 
@@ -148,7 +140,6 @@ public class GlobalExceptionHandler {
       HttpServletRequest request) {
 
     HttpStatus status = INTERNAL_SERVER_ERROR;
-    log(e, request, status);
     return ResponseEntity.status(status).body(ErrorResponse.from(CommonErrorCode.INTERNAL_SERVER_ERROR));
   }
 
@@ -157,13 +148,6 @@ public class GlobalExceptionHandler {
       HttpServletRequest request) {
 
     HttpStatus status = INTERNAL_SERVER_ERROR;
-    log(e, request, status);
     return ResponseEntity.status(status).body(ErrorResponse.from(CommonErrorCode.INTERNAL_SERVER_ERROR));
-  }
-
-  private static void log(Throwable e, HttpServletRequest request, HttpStatus status) {
-
-    log.warn("{}:{}:{}:{}", request.getRequestURI(), status.value(), e.getClass().getSimpleName(),
-        e.getMessage());
   }
 }

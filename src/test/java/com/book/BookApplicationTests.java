@@ -1,5 +1,6 @@
 package com.book;
 
+import com.book.common.support.DatabaseCleanUp;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;

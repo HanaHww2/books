@@ -1,0 +1,61 @@
+services:
+  be:
+    container_name: book-be
+    build:
+      context: .
+      dockerfile: Dockerfile.be
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs_8080:/app/logs
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    depends_on:
+      pgsql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  pgsql:
+    container_name: book-pgsql
+    build:
+      context: .
+      dockerfile: Dockerfile.pg-ko
+      args:
+        PG_MAJOR: "16"
+    image: my-postgres:ko
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: book
+      TZ: Asia/Seoul
+    volumes:
+      - postgres-book-data:/var/lib/postgresql/data
+    command: [ "postgres", "-c", "log_statement=all", "-c", "log_destination=stderr" ]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U book -d book || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    container_name: book-redis
+    image: redis:8
+    ports:
+      - "6379:6379"
+    environment:
+      TZ: Asia/Seoul
+      REDIS_ARGS: "--requirepass systempass"
+    volumes:
+      - redis-book-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  postgres-book-data:
+  redis-book-data:

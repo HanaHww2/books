@@ -10,4 +10,4 @@ ALTER TABLE books
         ) STORED;
 
 -- 인덱스
-CREATE INDEX tsv_books_idx ON books USING GIN (tsv);
+CREATE INDEX IF NOT EXISTS tsv_books_idx ON books USING GIN (tsv);

@@ -14,3 +14,14 @@ spring:
   config.activate.on-profile: test
   data:
     redis:
+
+---
+# dev 환경
+spring:
+  config.activate.on-profile: dev
+  data:
+    redis:
+      host: book-redis
+      port: 6379
+      username: default
+      password: systempass

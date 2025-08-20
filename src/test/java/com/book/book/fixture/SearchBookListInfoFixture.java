@@ -2,7 +2,7 @@ package com.book.book.fixture;
 
 import com.book.book.application.dto.info.SearchBookListInfo;
 import com.book.book.application.dto.info.SearchBookListInfo.PageInfo;
-import com.book.book.application.dto.info.SearchBookListInfo.SearchBookResponse;
+import com.book.book.application.dto.info.SearchBookListInfo.SearchBookInfo;
 import com.book.book.application.dto.info.SearchBookListInfo.SearchMetaData;
 import java.util.List;
 
@@ -22,10 +22,17 @@ public class SearchBookListInfoFixture {
             .totalElements(3L)
             .build())
         .books(
-            List.of(SearchBookResponse.from(BookFixture.of("test1", "123456789123")),
-                SearchBookResponse.from(BookFixture.of("test2", "123456789124")),
-                SearchBookResponse.from(BookFixture.of("test3", "123456789125")))
+            List.of(createSearchBookInfo("test1", "123456789123"),
+                createSearchBookInfo("test2", "123456789124"),
+                createSearchBookInfo("test3", "123456789125"))
         )
+        .build();
+  }
+
+  public static SearchBookInfo createSearchBookInfo(String title, String isbn) {
+    return SearchBookInfo.builder()
+        .title(title)
+        .isbn(isbn)
         .build();
   }
 }

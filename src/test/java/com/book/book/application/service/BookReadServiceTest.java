@@ -21,10 +21,11 @@ import com.book.book.application.service.search_strategy.SearchStrategy;
 import com.book.book.application.service.search_strategy.SearchStrategyResolver;
 import com.book.book.application.service.search_strategy.SearchStrategyType;
 import com.book.book.domain.entity.Book;
+import com.book.book.domain.info.BookSimpleInfo;
 import com.book.book.domain.info.PopularKeyword;
 import com.book.book.domain.repository.BookRepository;
 import com.book.book.domain.repository.PopularKeywordRepository;
-import com.book.book.fixture.BookFixture;
+import com.book.book.fixture.BookSimpleInfoFixture;
 import com.book.common.exception.CommonApiException;
 import java.util.List;
 import java.util.Optional;
@@ -161,11 +162,11 @@ class BookReadServiceTest {
     String[] keywords = {"카네기"};
     given(strategy.getKeywords(keyword)).willReturn(keywords);
 
-    List<Book> books = List.of(
-        BookFixture.of("카네기 인간관계론", "9786543210123"),
-        BookFixture.of("카네기의 성공 습관", "9786543210124")
+    List<BookSimpleInfo> books = List.of(
+        BookSimpleInfoFixture.of("카네기 인간관계론", "9786543210123"),
+        BookSimpleInfoFixture.of("카네기의 성공 습관", "9786543210124")
     );
-    Page<Book> bookPage = new PageImpl<>(books, pageable, books.size());
+    Page<BookSimpleInfo> bookPage = new PageImpl<>(books, pageable, books.size());
     given(bookRepository.searchBooks("'카네기'", pageable)).willReturn(bookPage);
 
     // when

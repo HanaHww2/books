@@ -1,6 +1,6 @@
 package com.book.book.application.dto.info;
 
-import com.book.book.domain.entity.Book;
+import com.book.book.domain.info.BookSimpleInfo;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
@@ -10,12 +10,12 @@ import org.springframework.data.domain.Pageable;
 @Builder
 public record SearchBookListInfo(
     PageInfo pageInfo,
-    List<SearchBookResponse> books,
+    List<SearchBookInfo> books,
     String searchQuery,
     SearchMetaData searchMetaData
 ) {
 
-  public static SearchBookListInfo of(Page<Book> bookPage, String searchQuery, String strategy, Long executionTime) {
+  public static SearchBookListInfo of(Page<BookSimpleInfo> bookPage, String searchQuery, String strategy, Long executionTime) {
     Pageable pageable = bookPage.getPageable();
 
     return SearchBookListInfo.builder()
@@ -27,7 +27,7 @@ public record SearchBookListInfo(
             .build()
         )
         .books(bookPage.getContent().stream()
-            .map(SearchBookResponse::from)
+            .map(SearchBookInfo::from)
             .toList()
         )
         .searchQuery(searchQuery)
@@ -40,7 +40,7 @@ public record SearchBookListInfo(
   }
 
   @Builder
-  public record SearchBookResponse(
+  public record SearchBookInfo(
       Long id,
       String title,
       String subTitle,
@@ -50,15 +50,15 @@ public record SearchBookListInfo(
       LocalDate published
   ) {
 
-    public static SearchBookResponse from(Book book) {
-      return SearchBookResponse.builder()
+    public static SearchBookInfo from(BookSimpleInfo book) {
+      return SearchBookInfo.builder()
           .id(book.getId())
-          .title(book.getBaseInfo().getTitle())
-          .subTitle(book.getBaseInfo().getSubTitle())
-          .author(book.getBaseInfo().getAuthor())
-          .image(book.getExtraInfo().getImage())
+          .title(book.getTitle())
+          .subTitle(book.getSubTitle())
+          .author(book.getAuthor())
+          .image(book.getImage())
           .isbn(book.getIsbn())
-          .published(book.getPublishInfo().getPublished())
+          .published(book.getPublished())
           .build();
     }
   }

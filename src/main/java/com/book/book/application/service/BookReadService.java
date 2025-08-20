@@ -11,6 +11,7 @@ import com.book.book.application.exception.BookErrorCode;
 import com.book.book.application.service.search_strategy.SearchStrategy;
 import com.book.book.application.service.search_strategy.SearchStrategyResolver;
 import com.book.book.domain.entity.Book;
+import com.book.book.domain.info.BookSimpleInfo;
 import com.book.book.domain.info.PopularKeyword;
 import com.book.book.domain.repository.BookRepository;
 import com.book.book.domain.repository.PopularKeywordRepository;
@@ -53,7 +54,7 @@ public class BookReadService {
     SearchStrategy strategy = searchStrategyResolver.resolve(keyword);
     String tsquery = strategy.buildQuery(keyword);
 
-    Page<Book> bookPage = bookRepository.searchBooks(tsquery, pageable);
+    Page<BookSimpleInfo> bookPage = bookRepository.searchBooks(tsquery, pageable);
     popularKeywordRepository.record(strategy.getKeywords(keyword), strategy.type());
     Instant end = Instant.now();
     long executionTime = Duration.between(start, end).toMillis();

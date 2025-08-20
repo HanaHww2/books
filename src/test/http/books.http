@@ -3,3 +3,12 @@ GET {{url}}/api/v1/books?isbn=9791193000717
 
 ### 도서 상세 조회 - id
 GET {{url}}/api/v1/books?id=13
+
+### 도서 목록 조회 - 단일
+GET {{url}}/api/v1/books/list?page=1&size=10&keyword=ai
+
+### 도서 목록 조회 - 합집합
+GET {{url}}/api/v1/books/list?page=1&size=10&keyword=울림|딸
+
+### 도서 목록 조회 - 차집합
+GET {{url}}/api/v1/books/list?page=1&size=10&keyword=카네기-딸

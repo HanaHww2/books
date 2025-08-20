@@ -1,5 +1,6 @@
 package com.book;
 
+import com.book.common.container.TestcontainersConfiguration;
 import org.springframework.boot.SpringApplication;
 
 public class TestBookApplication {

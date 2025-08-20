@@ -12,12 +12,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.book.book.application.dto.info.BookDetailInfo;
+import com.book.book.application.dto.info.SearchBookListInfo;
 import com.book.book.application.dto.query.GetBookDetailQuery;
+import com.book.book.application.dto.query.SearchBookListQuery;
 import com.book.book.fixture.BookDetailInfoFixture;
+import com.book.book.fixture.SearchBookListInfoFixture;
 import com.book.common.support.ControllerTestSupport;
 import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
@@ -119,6 +123,64 @@ class BookControllerTest extends ControllerTestSupport {
         .andExpect(rs -> assertThat(rs.getResolvedException())
             .isExactlyInstanceOf(MethodArgumentNotValidException.class))
         .andExpect(jsonPath("$.errors[0].message").value("id는 0보다 큰 수입니다."))
+        .andDo(print());
+    verifyNoInteractions(bookReadService);
+  }
+
+  @DisplayName("도서 정보 검색 api - 200 성공")
+  @Test
+  void searchBookList() throws Exception {
+
+    // given
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("keyword", "test");
+    params.add("page", "1");
+    params.add("size", "10");
+
+    SearchBookListInfo bookListInfo = SearchBookListInfoFixture.create();
+    when(bookReadService.searchBookListBy(any(SearchBookListQuery.class), any(Pageable.class)))
+        .thenReturn(bookListInfo);
+
+    // when
+    ResultActions resultActions = mockMvc.perform(
+        get("/api/v1/books/list")
+            .params(params));
+
+    // then
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.searchQuery").value(bookListInfo.searchQuery()))
+        .andExpect(jsonPath("$.searchMetaData.strategy").value(bookListInfo.searchMetaData().strategy()))
+        .andExpect(jsonPath("$.searchMetaData.executionTime").value(bookListInfo.searchMetaData().executionTime()))
+        .andExpect(jsonPath("$.pageInfo.currentPage").value(bookListInfo.pageInfo().currentPage()))
+        .andExpect(jsonPath("$.pageInfo.pageSize").value(bookListInfo.pageInfo().pageSize()))
+        .andExpect(jsonPath("$.pageInfo.totalPages").value(bookListInfo.pageInfo().totalPages()))
+        .andExpect(jsonPath("$.pageInfo.totalElements").value(bookListInfo.pageInfo().totalElements()))
+        .andExpect(jsonPath("$.books[0].isbn").value(bookListInfo.books().get(0).isbn()));
+  }
+
+  @DisplayName("도서 정보 검색 api - 400 키워드 유효성 검증 실패")
+  @Test
+  void searchBookList_failed_with_invalidKeyword() throws Exception {
+
+    // given
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("keyword", "카네기 인간관계론-딸의 모습");
+    params.add("page", "1");
+    params.add("size", "10");
+
+    // when
+    ResultActions resultActions = mockMvc.perform(
+        get("/api/v1/books/list")
+            .params(params));
+
+    // then
+    resultActions.andExpect(status().isBadRequest())
+        .andExpect(rs -> assertThat(rs.getResolvedException())
+            .isExactlyInstanceOf(MethodArgumentNotValidException.class))
+        .andExpect(jsonPath("$.errors[0].message")
+            .value("잘못된 키워드입니다. (키워드는 최대 2개까지 가능하며, '|' 또는 '-' 으로만 연결해야 하며 공백이 있어서는 안 됩니다.)"))
         .andDo(print());
     verifyNoInteractions(bookReadService);
   }

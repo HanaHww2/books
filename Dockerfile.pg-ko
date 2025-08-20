@@ -1,0 +1,58 @@
+ARG PG_MAJOR=16
+
+# ---------- builder: 컴파일 ----------
+FROM postgres:${PG_MAJOR}-bookworm AS builder
+ARG PG_MAJOR
+ARG TARGETARCH
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential git curl ca-certificates automake autoconf libtool pkg-config \
+    postgresql-server-dev-$PG_MAJOR \
+ && rm -rf /var/lib/apt/lists/*
+
+# MeCab-ko 설치
+ENV MECAB_KO_VER=mecab-0.996-ko-0.9.2
+RUN curl -L -o /tmp/mecab-ko.tar.gz \
+      https://bitbucket.org/eunjeon/mecab-ko/downloads/${MECAB_KO_VER}.tar.gz \
+ && tar -xzf /tmp/mecab-ko.tar.gz -C /tmp \
+ && cd /tmp/${MECAB_KO_VER} \
+ && ./configure $( [ "$TARGETARCH" = "arm64" ] && echo "--build=aarch64-unknown-linux-gnu" ) \
+ && make -j"$(nproc)" && make install && ldconfig
+
+# mecab-ko-dic 설치 (UTF-8)
+ENV MECAB_KO_DIC_VER=mecab-ko-dic-2.1.1-20180720
+RUN curl -L -o /tmp/mecab-ko-dic.tar.gz \
+      https://bitbucket.org/eunjeon/mecab-ko-dic/downloads/${MECAB_KO_DIC_VER}.tar.gz \
+ && tar -xzf /tmp/mecab-ko-dic.tar.gz -C /tmp \
+ && cd /tmp/${MECAB_KO_DIC_VER} \
+ && autoreconf -fi \
+ && ./configure --with-charset=utf8 \
+ && make -j"$(nproc)" && make install && ldconfig
+
+# textsearch_ko 확장 컴파일/설치
+RUN git clone https://github.com/i0seph/textsearch_ko.git /tmp/textsearch_ko \
+ && cd /tmp/textsearch_ko \
+ && make USE_PGXS=1 \
+ && make USE_PGXS=1 install
+
+# ---------- runtime: 최소 파일만 복사 ----------
+FROM postgres:${PG_MAJOR}-bookworm
+ARG PG_MAJOR
+
+# MeCab 런타임/사전
+COPY --from=builder /usr/local/bin/mecab* /usr/local/bin/
+COPY --from=builder /usr/local/lib/libmecab* /usr/local/lib/
+COPY --from=builder /usr/local/lib/mecab /usr/local/lib/mecab
+COPY --from=builder /usr/local/etc/mecabrc /usr/local/etc/mecabrc
+RUN sed -i 's#^dicdir *= *.*#dicdir = /usr/local/lib/mecab/dic/mecab-ko-dic#' /usr/local/etc/mecabrc || true
+
+ENV MECABRC=/usr/local/etc/mecabrc
+
+# PostgreSQL 확장 산출물
+COPY --from=builder /usr/lib/postgresql/$PG_MAJOR/lib/ts_mecab_ko.so /usr/lib/postgresql/$PG_MAJOR/lib/
+COPY --from=builder /usr/share/postgresql/$PG_MAJOR/extension/textsearch_ko* /usr/share/postgresql/$PG_MAJOR/extension/
+
+RUN ldconfig
+
+# 초기화 SQL 복사
+COPY pg-ko/init.sql /docker-entrypoint-initdb.d/999_textsearch_ko.sql

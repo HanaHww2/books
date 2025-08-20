@@ -33,4 +33,30 @@ public class BookFixture {
         )
         .build();
   }
+
+  public static Book of(String title, String isbn) {
+    return Book.builder()
+        .isbn(isbn)
+        .baseInfo(
+            BaseInfo.builder()
+                .title(title)
+                .subTitle(title)
+                .author("Book Author")
+                .build()
+        )
+        .extraInfo(
+            ExtraInfo.builder()
+                .description("Book Description")
+                .image("https://link.com/Book-Image")
+                .price(10000)
+                .build()
+        )
+        .publishInfo(
+            PublishInfo.builder()
+                .publisher("Book Publisher")
+                .published(LocalDate.of(2000, 1, 1))
+                .build()
+        )
+        .build();
+  }
 }

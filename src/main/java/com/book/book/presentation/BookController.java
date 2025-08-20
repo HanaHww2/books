@@ -37,7 +37,7 @@ public class BookController {
   )
   @GetMapping
   public ResponseEntity<BookDetailResponse> getBookDetailInfo(
-      @Validated @Parameter(description = "도서 상세 조회 요청 파라미터") GetBookDetailRequest req) {
+      @Validated @Parameter(description = "도서 상세 조회 요청 파라미터 (isbn 또는 id)") GetBookDetailRequest req) {
 
     BookDetailResponse res = BookDetailResponse.from(bookReadService.findBookDetailInfoBy(req.toQuery()));
     return ResponseEntity.ok(res);

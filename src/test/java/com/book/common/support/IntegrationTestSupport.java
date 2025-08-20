@@ -1,5 +1,6 @@
 package com.book.common.support;
 
+import com.book.common.container.RedisTestContainerExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;

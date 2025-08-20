@@ -26,4 +26,17 @@ class SearchBasicStrategyTest {
     // then
     assertThat(tsquery).isEqualTo("'카네기'");
   }
+
+  @DisplayName("구분자가 없으면 원본 문자열 하나만 반환")
+  @Test
+  void getKeywords_returnSingleKeyword() {
+    // given
+    String keyword = "카네기";
+
+    // when
+    String[] result = strategy.getKeywords(keyword);
+
+    // then
+    assertThat(result).containsExactly("카네기");
+  }
 }

@@ -26,4 +26,17 @@ class SearchOrStrategyTest {
     // then
     assertThat(tsquery).isEqualTo("'카네기' | '딸'");
   }
+
+  @DisplayName("'|' 구분자로 키워드를 분리하고 모든 요소 반환")
+  @Test
+  void getKeywords_returnAllSplitedByPipe() {
+    // given
+    String keyword = "카네기|딸";
+
+    // when
+    String[] result = strategy.getKeywords(keyword);
+
+    // then
+    assertThat(result).containsExactly("카네기", "딸");
+  }
 }

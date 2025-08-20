@@ -16,7 +16,7 @@
     </encoder>
   </appender>
 
-  <springProfile name="!(prod|develop)">
+  <springProfile name="!(prod|dev)">
 
     <property name="INFO_FILE" value="${LOG_TEMP}/spring.log}"/>
     <include resource="./logback/info-file-appender.xml"/>
@@ -31,7 +31,17 @@
     </root>
   </springProfile>
 
-  <springProfile name="(prod|develop)">
+  <springProfile name="dev">
+
+    <property name="ERROR_FILE" value="${LOG_TEMP}/spring_error.log}"/>
+    <include resource="./logback/error-file-appender.xml"/>
+
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="ERROR_LOG"/>
+    </root>
+  </springProfile>
+  <springProfile name="prod">
 
     <property name="ERROR_FILE" value="${LOG_TEMP}/spring_error.log}"/>
     <include resource="./logback/error-file-appender.xml"/>
@@ -40,4 +50,5 @@
       <appender-ref ref="ERROR_LOG"/>
     </root>
   </springProfile>
+
 </configuration>
